@@ -1,21 +1,21 @@
-# Yandex.Music Telegram Bot
+# Telegram-бот для Яндекс.Музыки
 
-Telegram bot that takes a Yandex.Music link (track / album / playlist / artist) and replies with a rich card: title, artist, duration, cover image, and cross-platform links to multiple music platforms.
+Telegram-бот, который принимает ссылку на Яндекс.Музыку (`track / album / playlist / artist`) и возвращает карточку с информацией: название, артист, длительность, обложка и ссылки на другие музыкальные платформы.
 
-Live bot: https://t.me/Yandex_botik_bot
+Ссылка на бота: https://t.me/Yandex_botik_bot
 
-## Features
+## Возможности
 
-- Track cards with cover image, metadata, and cross-platform links
-- Albums / playlists / artists support
-- song.link integration for Spotify / Apple Music / YouTube Music / Deezer / TIDAL / Amazon Music
-- Similar tracks with drill-down into full cards
-- Inline mode: `@Yandex_botik_bot <link>` in any chat
-- Redis caching for fast repeated lookups
+- карточки треков с обложкой, метаданными и внешними ссылками
+- поддержка альбомов, артистов и плейлистов
+- интеграция с `song.link` для Spotify / Apple Music / YouTube Music / Deezer / TIDAL / Amazon Music
+- похожие треки с переходом в полную карточку
+- inline-режим: `@Yandex_botik_bot <ссылка>` в любом чате
+- Redis-кэш для ускорения повторных запросов
 
-## Stack
+## Стек
 
-- Python 3.12 in Docker, Python 3.14 supported for local development
+- Python 3.14 локально, Python 3.14 в Docker
 - aiogram 3.x
 - yandex-music
 - httpx
@@ -23,78 +23,78 @@ Live bot: https://t.me/Yandex_botik_bot
 - Docker Compose
 - pytest + respx + fakeredis
 
-## Architectural decisions
+## Архитектурные решения
 
-| Decision | Why |
+| Решение | Почему |
 |---|---|
-| Polling, not webhooks | Simpler VPS deployment for a test task |
-| Docker Compose | Bot and Redis come up together in one command |
-| Read-through Redis cache | Faster repeated requests and safer external rate limits |
-| Mock external APIs in tests | Deterministic, fast test suite |
-| Pure renderers | Formatting logic is easy to unit-test |
-| Thin handlers | Business logic stays in services |
+| Polling, а не webhooks | Для тестового задания это проще в деплое на VPS |
+| Docker Compose | Бот и Redis поднимаются одной командой |
+| Read-through Redis cache | Повторные запросы быстрее и меньше нагрузка на внешние API |
+| Моки внешних API в тестах | Тесты остаются быстрыми и предсказуемыми |
+| Отдельные renderers | Форматирование карточек проще тестировать |
+| Thin handlers | Бизнес-логика вынесена в services |
 
-## Run locally
+## Локальный запуск
 
 ```bash
 git clone <repo-url>
 cd yandex-music-bot
 cp .env.example .env
-# fill TELEGRAM_BOT_TOKEN and YANDEX_MUSIC_TOKEN
+# заполнить TELEGRAM_BOT_TOKEN и YANDEX_MUSIC_TOKEN
 python -m uv sync
 python -m uv run python -m bot.main
 ```
 
-To get a Yandex.Music token:
+Получение токена Яндекс.Музыки:
 
 ```bash
 python -m uv run python scripts/get_yandex_token.py
 ```
 
-## Run with Docker
+## Запуск через Docker
 
 ```bash
 cp .env.example .env
-# fill TELEGRAM_BOT_TOKEN and YANDEX_MUSIC_TOKEN
+# заполнить TELEGRAM_BOT_TOKEN и YANDEX_MUSIC_TOKEN
 docker compose up -d --build
 docker compose logs -f bot
 ```
 
-## Production notes
+## Примечания по продакшену
 
-- The bot is deployed on a VPS and runs with Docker Compose.
-- Redis is optional for local development, but recommended for stable production behaviour and lower external API load.
-- If song.link has no mapping for a track, the bot still returns the main card without cross-platform links.
+- бот развёрнут на VPS и работает через Docker Compose
+- Redis не обязателен для локальной разработки, но желателен для стабильной работы и снижения нагрузки на внешние API
+- если `song.link` не находит соответствие для трека, бот всё равно возвращает основную карточку без блока внешних ссылок
 
-## Run tests
+## Запуск тестов
 
 ```bash
 python -m uv run pytest -v
 ```
 
-## Project structure
+## Структура проекта
 
 ```text
 bot/
-├── main.py            # bot bootstrap and dependency wiring
-├── config.py          # pydantic-settings config
+├── main.py            # bootstrap бота и wiring зависимостей
+├── config.py          # конфигурация через pydantic-settings
 ├── handlers/          # system, link, callbacks, inline
 ├── services/          # parser, cache, YandexMusic, song.link
-├── renderers/         # HTML captions
-├── keyboards.py       # inline keyboards
-└── middlewares.py     # rate limiting and error handling
+├── renderers/         # HTML-карточки
+├── keyboards.py       # inline-клавиатуры
+└── middlewares.py     # rate limiting и error handling
 
-tests/                 # unit tests for modules and handlers
-docs/superpowers/      # design spec and implementation plan
+tests/                 # unit-тесты модулей и handlers
+docs/superpowers/      # дизайн и план реализации
 docker-compose.yml
 Dockerfile
 ```
 
-## Roadmap
+## Что можно улучшить дальше
 
 - 30-second preview audio
-- Lyrics on demand
-- `/history` per user
-- `/stats` for admin
+- lyrics on demand
+- `/history` по пользователю
+- `/stats` для администратора
 - i18n (ru/en)
-- Personalized recommendations
+- персонализированные рекомендации
