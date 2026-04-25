@@ -2,6 +2,10 @@
 __pycache__/
 *.pyc
 .venv/
+.token-venv/
 .pytest_cache/
+pytest-cache-files-*/
+*.egg-info/
+deploy.zip
 .idea/
 .vscode/
